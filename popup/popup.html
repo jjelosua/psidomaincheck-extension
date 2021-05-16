@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="bootstrap.min.css"/>
+    <link rel="stylesheet" href="popup.css"/>
+  </head>
+
+<body>
+  <div id="hostname" class="pt-2">><b>domain.com</b></div>
+  <div id="popup-content" class="py-2">
+    <p>Total domains blocked: <span id="statistics">0</span></p>
+  s</div>
+  <div id="outer-wrapper">
+
+    <label for="url">Url</label>
+    <input id="url" type="text">
+    <button id="checkdomain">Check domain</button>
+  </div>
+  <hr>
+  <!-- tools -->
+  <div id="basicTools" class="toolRibbon">
+    <button id="active-protection" type="button" class="btn tool" data-bs-toggle="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Protection status" autocomplete="off">active protection</button>
+    <button id="reset-statistics" class="btn tool" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Reset statistics">reset statistics</button>
+  </div>
+  <footer id="footer">Privacy first security provided by PSIDomainCheck.es</footer>
+  <script src="bootstrap.min.js"></script>
+  <script src="popup.js"></script>
+</body>
+
+</html>
