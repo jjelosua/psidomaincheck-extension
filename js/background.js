@@ -1,3 +1,4 @@
+'use strict';
 // sodium is loaded but not initialized yet
 sodium.ready.then(sodiumInitialized).catch(sodiumNotInitialized);
 
@@ -81,7 +82,7 @@ function computeDomainCryptoInfo(domain) {
 }
 
 async function validateDomain(response, a_inv_hex) {
-    blocked = false;
+    let blocked = false;
 
     let double_blinded_domain_hex = response.double_blinded_domain;
     console.log("double_blinded_domain", double_blinded_domain_hex);
@@ -110,6 +111,15 @@ async function checkBrowserDomain(requestDetails) {
         console.log("Nothing to do, let browser continue with its life");
     }
     console.log("final checkBrowserDomain");
+}
+
+async function checkManualDomain(domain, callback) {
+    console.log("inicio checkManualDomain");
+    console.log("domain", domain);
+    let data = computeDomainCryptoInfo(domain);
+    let blocked = await callPSICheckDomain(data);
+    console.log("final checkManualDomain");
+    callback(blocked);
 }
 
 function activeProtection() {
