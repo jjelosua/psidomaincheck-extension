@@ -106,7 +106,7 @@ async function checkBrowserDomain(requestDetails) {
     let blocked = await callPSICheckDomain(data);
     if (blocked) {
         console.log("should be blocked!!")
-        return {redirectUrl: browser.runtime.getURL("blocked/blocked.html")};
+        return {redirectUrl: browser.runtime.getURL("blocked.html")};
     } else {
         console.log("Nothing to do, let browser continue with its life");
     }
