@@ -1,5 +1,4 @@
 'use strict';
-const urlInput =  document.querySelector("#url");
 
 function onError(error) {
   console.log(error)
@@ -8,9 +7,9 @@ function onError(error) {
 function showResults(blocked) {
     console.log("blocked", blocked);
     if (blocked) {
-        addAlert("Domain has been found as malicious in PSIDomainCheck intelligence feed.", "alertplaceholder");
+        addAlert("Domain has been found as malicious in PSIDomainCheck intelligence feed.", "manual-alert-placeholder");
     } else {
-        addAlert("Domain not found as malicious within PSIDomainCheck intelligence feed.", "alertplaceholder");
+        addAlert("Domain not found as malicious within PSIDomainCheck intelligence feed.", "manual-alert-placeholder");
     }
 }
 
@@ -60,8 +59,8 @@ function isValidDomain(v) {
   return re.test(v);
 }
 
-function checkdomain(el) {
-    console.log("el.value", el.value);
+function checkdomain() {
+    let urlInput =  document.getElementById("url");
     let url = urlInput.value;
     let normalized_url = addhttp(url)
     let testUrl = null
@@ -81,6 +80,7 @@ function checkdomain(el) {
     else {
         // TODO show error
         console.log("not a valid domain", domain);
+        addAlert("not a valid domain, try again", "manual-alert-placeholder");
     }
 }
 

@@ -19,43 +19,16 @@ function onError(error) {
 }
 
 
-function kakoServerCheckDomain(prefix, p, callback) {
-    let kakoUrl = new URL("http://127.0.0.1/api/checkdomain")
-    const params = new URLSearchParams();
-    params.set('hash_prefix', prefix);
-    params.set('domain', p);
-    kakoUrl.search = params.toString();
-    console.log("kakoUrl", kakoUrl);
-    let xhr = new XMLHttpRequest();
-    xhr.open("GET", kakoUrl);
-    xhr.send();
-    let req = new XMLHttpRequest();
-    req.open('GET', kakoUrl, true);
-    req.onreadystatechange = function (aEvt) {
-        if (req.readyState == 4) {
-            if(req.status == 200) {
-                let response = JSON.parse(req.responseText);
-                validateDomain(response, callback)
-            }
-            else {
-                console.log("Error communicating with kako server\n");
-            }
-        }
-    };
-    req.send(null);
-}
-
-
 async function callPSICheckDomain(data, callback) {
     let blocked = false;
-    let kakoUrl = new URL("http://127.0.0.1/api/checkdomain")
+    let psicheckdomainUrl = new URL("https://psidomaincheck.es/api/checkdomain");
     const params = new URLSearchParams();
     params.set('hash_prefix', data.hash_prefix);
     params.set('domain', data.blind_domain_hex);
-    kakoUrl.search = params.toString();
+    psicheckdomainUrl.search = params.toString();
     // ToDo add timeout since we are blocking the browser:
     // https://dmitripavlutin.com/timeout-fetch-request/
-    let response = await fetch(kakoUrl);
+    let response = await fetch(psicheckdomainUrl);
     response = await response.json();
     blocked = validateDomain(response, data.a_inv_hex);
     return blocked;
