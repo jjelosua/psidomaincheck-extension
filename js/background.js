@@ -34,6 +34,11 @@ async function callPSICheckDomain(data, callback) {
     return blocked;
 }
 
+function normalizeDomain(domain) {
+    // strip leading www and lowercase domain
+    return domain.replace(/^www\./,'').toLowerCase();
+}
+
 function computeDomainCryptoInfo(domain) {
 
     // Get a random scalar from ristretto255
@@ -74,8 +79,10 @@ async function checkBrowserDomain(requestDetails) {
     console.log("inicio checkBrowserDomain");
     let url = new URL(requestDetails.url);
     let domain = url.hostname;
-    console.log("domain", domain);
-    let data = computeDomainCryptoInfo(domain);
+    let norm_domain = normalizeDomain(domain);
+    console.log("domain", norm_domain);
+
+    let data = computeDomainCryptoInfo(norm_domain);
     let blocked = await callPSICheckDomain(data);
     if (blocked) {
         console.log("should be blocked!!")
@@ -88,8 +95,9 @@ async function checkBrowserDomain(requestDetails) {
 
 async function checkManualDomain(domain, callback) {
     console.log("inicio checkManualDomain");
-    console.log("domain", domain);
-    let data = computeDomainCryptoInfo(domain);
+    let norm_domain = normalizeDomain(domain);
+    console.log("domain", norm_domain);
+    let data = computeDomainCryptoInfo(norm_domain);
     let blocked = await callPSICheckDomain(data);
     console.log("final checkManualDomain");
     callback(blocked);
