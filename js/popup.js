@@ -4,19 +4,20 @@ function onError(error) {
   console.log(error)
 }
 
-function showResults(blocked) {
+function showResults(blocked, norm_domain) {
     console.log("blocked", blocked);
     if (blocked) {
-        addAlert("Domain has been found as malicious in PSIDomainCheck intelligence feed.", "manual-alert-placeholder");
+        addAlert(norm_domain + " has been found as malicious in PSIDomainCheck intelligence feed.", "manual-alert-container", "alert-danger");
     } else {
-        addAlert("Domain not found as malicious within PSIDomainCheck intelligence feed.", "manual-alert-placeholder");
+        addAlert(norm_domain + " not found as malicious within PSIDomainCheck intelligence feed.", "manual-alert-container", "alert-info");
     }
 }
 
-function addAlert(message, elid) {
-    let position = document.getElementById(elid);
+function addAlert(message, elid, alert_type) {
+    let container = document.getElementById(elid);
+
     var div = document.createElement('div');
-    div.classList.add("alert", "alert-success", "alert-dismissible", "fade", "show", "mx-2", "popup-alert");
+    div.classList.add("alert", alert_type, "alert-dismissible", "fade", "show", "mx-2");
     div.setAttribute("role", "alert");
 
     var contentMessage = document.createTextNode(message);
@@ -30,7 +31,12 @@ function addAlert(message, elid) {
     div.appendChild(contentMessage);
     div.appendChild(closeBtn);
 
-    position.parentNode.insertBefore(div, position);
+    if (container.children.length) {
+        container.replaceChild(div, container.children[0]);
+    }
+    else {
+        container.appendChild(div);
+    }
 }
 
 function getHostname(tabs) {
@@ -60,8 +66,7 @@ function isValidDomain(v) {
 }
 
 function checkdomain() {
-    let urlInput =  document.getElementById("url");
-    let url = urlInput.value;
+    let url = urlView.value;
     let normalized_url = addhttp(url)
     let testUrl = null
     try {
@@ -74,13 +79,14 @@ function checkdomain() {
     };
     let domain = testUrl.hostname;
     if (isValidDomain(domain)) {
+        document.getElementById("url").value = '';
         browser.runtime.getBackgroundPage().then(
             function(background) {return background.checkManualDomain(domain, showResults);}, onError);
     }
     else {
         // TODO show error
         console.log("not a valid domain", domain);
-        addAlert("not a valid domain, try again", "manual-alert-placeholder");
+        addAlert("not a valid domain, try again", "manual-alert-container", "alert-warning");
     }
 }
 
@@ -88,19 +94,21 @@ function protection() {
     let mode = activeProtectionBtn.getAttribute('aria-pressed');
     browser.storage.local.set({active: mode});
     if (mode == "true") {
-        addAlert("Protection enabled!", "footer");
+        browser.browserAction.setIcon({path: "img/psidc-48@2x.png"});
+        addAlert("Protection enabled!", "protection-alert-container", "alert-success");
     } else {
-        addAlert("Protection disabled", "footer");
+        browser.browserAction.setIcon({path: "img/psidc-off-48@2x.png"});
+        addAlert("Protection disabled", "protection-alert-container", "alert-warning");
     }
 }
 
 // Data view
 let hostnameView = document.getElementById("hostname");
 let statisticsView = document.getElementById("statistics");
-
-
+let urlView = document.getElementById("url");
 let activeProtectionBtn = document.getElementById("active-protection");
 let checkDomainBtn = document.getElementById("checkdomain");
+
 let hostname = browser.tabs.query({ active: true, currentWindow: true });
 hostname.then(getHostname, onError);
 
@@ -109,3 +117,9 @@ hostname.then(getHostname, onError);
 // Listeners
 checkDomainBtn.addEventListener('click', checkdomain);
 activeProtectionBtn.addEventListener('click', protection);
+
+urlView.addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+        checkdomain();
+    }
+});

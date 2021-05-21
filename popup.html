@@ -13,17 +13,19 @@
     <p>Total domains blocked: <span id="statistics">0</span></p>
   </div>
   <div id="outer-wrapper">
-    <label for="url">Url</label>
-    <input id="url" type="text">
-    <button id="checkdomain">Check domain</button>
-    <div id="manual-alert-placeholder"></div>
+    <div class="input-group">
+      <input id="url" type="text" placeholder="Type a url or domain" class="form-control">
+      <button id="checkdomain" type="button" class="btn btn-outline-dark">Check domain</button>
+    </div>
+    <div id="manual-alert-container"></div>
   </div>
   <hr>
   <!-- tools -->
   <div id="basicTools" class="toolRibbon">
-    <button id="active-protection" type="button" class="btn tool" data-bs-toggle="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Protection status" autocomplete="off">active protection</button>
-    <button id="reset-statistics" class="btn tool" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Reset statistics">reset statistics</button>
+    <button id="active-protection" type="button" class="btn btn-outline-primary" data-bs-toggle="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Protection status" autocomplete="off">Active Protection</button>
+    <button id="reset-statistics" class="btn btn-outline-secondary" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Reset statistics">Reset Statistics</button>
   </div>
+  <div id="protection-alert-container"></div>
   <footer id="footer">Privacy first security provided by PSIDomainCheck.es</footer>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/popup.js"></script>

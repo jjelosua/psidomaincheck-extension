@@ -100,7 +100,7 @@ async function checkManualDomain(domain, callback) {
     let data = computeDomainCryptoInfo(norm_domain);
     let blocked = await callPSICheckDomain(data);
     console.log("final checkManualDomain");
-    callback(blocked);
+    callback(blocked, norm_domain);
 }
 
 function activeProtection() {
@@ -112,14 +112,6 @@ function activeProtection() {
         );
     } else {
         chrome.webRequest.onBeforeRequest.removeListener(checkBrowserDomain);
-    }
-}
-
-function updateStatus() {
-    if (active === false){
-        browser.browserAction.setIcon({path: "img/vortex-off-48.png"});
-    } else {
-        browser.browserActsion.setIcon({path: "img/vortex-48.png"});
     }
 }
 
