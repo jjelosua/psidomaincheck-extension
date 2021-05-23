@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="css/bootstrap.min.css"/>
@@ -10,27 +10,29 @@
     <title>PSI Domain Check</title>
   <head>
   <body>
-
-    <div class="form-check form-switch form-switch-md">
-      <input class="form-check-input" type="checkbox" id="activeprotection">
-      <label class="form-check-label fs-4" for="activeprotection">Active Protection</label>
-    </div>
-    <div id="popup-content" class="py-2">
+    <div class="container">
+      <div class="form-check form-switch form-switch-md">
+        <input class="form-check-input" type="checkbox" id="activeprotection">
+        <label class="form-check-label fs-5" for="activeprotection">Active Protection</label>
+      </div>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-dark" disabled>
         Blocked domains <span id="statisticsbadge" class="badge badge-dark">0</span>
         </button>
         <button id="resetstatistics" type="button" class="btn btn-outline-primary">Reset Statistics</button>
       </div>
+      <div class="b-section-divider my-4"></div>
+      <div class="input-group">
+        <input id="url" type="text" placeholder="Type a url or domain" class="form-control">
+        <button id="checkdomain" type="button" class="btn btn-outline-primary">Check domain</button>
+      </div>
+      <div id="manual-alert-container" class="text-wrap"></div>
+      <div class="b-section-divider mt-4"></div>
+      <footer id="footer">
+            <img class="float-left" width="64" height="64" src="img/psidc-256.png"/>
+            <span class="text-wrap fs-5">PSIDomainCheck: <b><em>Privacy first security</em></b></span>
+      </footer>
     </div>
-    <div class="b-section-divider"></div>
-    <div class="input-group">
-      <input id="url" type="text" placeholder="Type a url or domain" class="form-control">
-      <button id="checkdomain" type="button" class="btn btn-outline-primary">Check domain</button>
-    </div>
-    <div id="manual-alert-container"></div>
-    <div class="b-section-divider"></div>
-    <footer id="footer">Privacy first security provided by PSIDomainCheck.es</footer>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/popup.js"></script>
   </body>

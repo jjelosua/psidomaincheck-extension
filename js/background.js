@@ -14,10 +14,6 @@ function onError(error) {
     console.log(error);
 }
 
-function setStorage() {
-  console.log("statistics saved to local storage");
-}
-
 function storeStatistics() {
     browser.storage.local.set({statistics}).catch(onError);
 }
@@ -73,7 +69,6 @@ async function validateDomain(response, a_inv_hex) {
     let blocked = false;
 
     let double_blinded_domain_hex = response.double_blinded_domain;
-    console.log("double_blinded_domain", double_blinded_domain_hex);
     let double_blinded_domain = sodium.from_hex(double_blinded_domain_hex);
     let a_inv = sodium.from_hex(a_inv_hex);
     let unblind_domain = sodium.crypto_scalarmult_ristretto255(a_inv, double_blinded_domain);
@@ -88,11 +83,13 @@ async function validateDomain(response, a_inv_hex) {
 // Active Protection functionality
 // Switch Active Protection status
 function activeProtection(active) {
-    console.log("active", active);
     if (active) {
         browser.webRequest.onBeforeRequest.addListener(
             checkBrowserDomain,
             {urls: ["<all_urls>"], types: ["main_frame"]},
+            // doable but a cache will be needed to increase performance
+            // leave it as a future line of work
+            //{urls: ["<all_urls>"]},
             ["blocking"]
         );
     } else {
@@ -101,12 +98,12 @@ function activeProtection(active) {
 }
 
 async function checkBrowserDomain(requestDetails) {
-    console.log("inicio checkBrowserDomain");
     let url = new URL(requestDetails.url);
     let domain = url.hostname;
     let norm_domain = normalizeDomain(domain);
+    // nothing to do avoid capturing our own generated traffic
+    if (norm_domain === "psidomaincheck.es") return;
     console.log("domain", norm_domain);
-
     let data = computeDomainCryptoInfo(norm_domain);
     let blocked = await callPSICheckDomain(data);
     if (blocked) {
@@ -118,7 +115,6 @@ async function checkBrowserDomain(requestDetails) {
 
 // Manual Protection functionality
 async function checkManualDomain(domain, callback) {
-    console.log("inicio checkManualDomain");
     let norm_domain = normalizeDomain(domain);
     console.log("domain", norm_domain);
     let data = computeDomainCryptoInfo(norm_domain);
@@ -128,5 +124,7 @@ async function checkManualDomain(domain, callback) {
 
 // initialize statistics on local storage on installation
 browser.runtime.onInstalled.addListener(details => {
-    browser.storage.local.set({statistics}).catch(onError);
+    browser.storage.local.set({
+        statistics: 0,
+        active: false}).catch(onError);
 });

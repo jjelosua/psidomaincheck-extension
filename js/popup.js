@@ -5,7 +5,6 @@ function onError(error) {
 }
 
 function getDataFromLocalStorage() {
-    console.log("getDataFromLocalStorage");
     browser.storage.local.get(["active","statistics"]).then(updateView, onError);
 }
 
@@ -29,7 +28,6 @@ function resetStatistics() {
 }
 
 function showResults(blocked, norm_domain) {
-    console.log("blocked", blocked);
     if (blocked) {
         addAlert(norm_domain + " has been found as malicious in PSIDomainCheck intelligence feed.", "manual-alert-container", "alert-danger");
     } else {
@@ -72,7 +70,7 @@ function addhttp(url) {
 
 function isValidDomain(v) {
   if (!v) return false;
-  var re = /^(?!:\/\/)([a-zA-Z0-9-]+\.){0,5}[a-zA-Z0-9-][a-zA-Z0-9-]+\.[a-zA-Z]{2,64}?$/gi;
+  var re = /^(?!:\/\/)([a-zA-Z0-9-]+\.){0,5}[a-zA-Z0-9-]+\.[a-zA-Z]{2,64}?$/gi;
   return re.test(v);
 }
 
@@ -84,19 +82,18 @@ function checkdomain() {
         testUrl = new URL(normalized_url);
     } catch (e) {
         if (e instanceof TypeError)
-            console.log("no se reconoce una url valida");
+            console.log("could not parse data into a url, please try again");
         else
             throw e; //we want to only handle TypeError
     };
     let domain = testUrl.hostname;
+    console.log("domain", domain);
     if (isValidDomain(domain)) {
         document.getElementById("url").value = '';
         browser.runtime.getBackgroundPage().then(
             function(background) {return background.checkManualDomain(domain, showResults);}, onError);
     }
     else {
-        // TODO show error
-        console.log("not a valid domain", domain);
         addAlert("not a valid domain, try again", "manual-alert-container", "alert-warning");
     }
 }
@@ -134,44 +131,3 @@ urlView.addEventListener("keyup", function(event) {
 });
 
 getDataFromLocalStorage();
-
-// local storage onChanged not being fired on firefox
-// take another approach
-
-// browser.storage.onChanged.addListener(changes => {
-//     console.log("Updating data...")
-//     let changedItems = Object.keys(changes);
-
-//     if (changedItems.includes("active")) {
-//         console.log("found change in active");
-
-//     }
-
-//     if (changedItems.includes("statistics")) {
-//         console.log("found change in statistics");
-//     }
-//     console.log("Updated data!")
-//     console.log("hola");
-//     console.log(changes);
-//     updateStatistics();
-// });
-
-// function logStorageChange(changes, area) {
-//   console.log("Change in storage area: " + area);
-
-//   let changedItems = Object.keys(changes);
-
-//   for (let item of changedItems) {
-//     console.log(item + " has changed:");
-//     console.log("Old value: ");
-//     console.log(changes[item].oldValue);
-//     console.log("New value: ");
-//     console.log(changes[item].newValue);
-//   }
-// }
-
-// browser.storage.onChanged.addListener(logStorageChange);
-
-// console.log("has listener", browser.storage.onChanged.hasListener(logStorageChange));
-
-
