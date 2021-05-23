@@ -1,24 +1,40 @@
 'use strict';
-// sodium is loaded but not initialized yet
-sodium.ready.then(sodiumInitialized).catch(sodiumNotInitialized);
-
-function sodiumInitialized() {
-    console.log("sodium initialized");
-}
+// sodium is loaded but not initialized yet check for errors
+sodium.ready.catch(sodiumNotInitialized);
 
 function sodiumNotInitialized(error) {
     console.log("sodium initialize error", error);
 }
 
 //global vars
-var active = false;
 var statistics = 0;
 
+//local storage
 function onError(error) {
     console.log(error);
 }
 
+function setStorage() {
+  console.log("statistics saved to local storage");
+}
 
+function storeStatistics() {
+    browser.storage.local.set({statistics}).catch(onError);
+}
+
+async function resetStatistics(callback) {
+    statistics = 0;
+    await storeStatistics();
+    callback();
+}
+
+// Auxilizary domain functions
+function normalizeDomain(domain) {
+    // strip leading www and lowercase domain
+    return domain.replace(/^www\./,'').toLowerCase();
+}
+
+// PSI Core functions
 async function callPSICheckDomain(data, callback) {
     let blocked = false;
     let psicheckdomainUrl = new URL("https://psidomaincheck.es/api/checkdomain");
@@ -34,17 +50,11 @@ async function callPSICheckDomain(data, callback) {
     return blocked;
 }
 
-function normalizeDomain(domain) {
-    // strip leading www and lowercase domain
-    return domain.replace(/^www\./,'').toLowerCase();
-}
-
 function computeDomainCryptoInfo(domain) {
 
     // Get a random scalar from ristretto255
     let a = sodium.crypto_core_ristretto255_scalar_random();
     let a_hex = sodium.to_hex(a);
-    //console.log("scalar", a_hex);
     // Get the inverted scalar to be able to unblind later
     let a_inv = sodium.crypto_core_ristretto255_scalar_invert(a);
     let a_inv_hex = sodium.to_hex(a_inv);
@@ -75,36 +85,11 @@ async function validateDomain(response, a_inv_hex) {
     return blocked;
 }
 
-async function checkBrowserDomain(requestDetails) {
-    console.log("inicio checkBrowserDomain");
-    let url = new URL(requestDetails.url);
-    let domain = url.hostname;
-    let norm_domain = normalizeDomain(domain);
-    console.log("domain", norm_domain);
-
-    let data = computeDomainCryptoInfo(norm_domain);
-    let blocked = await callPSICheckDomain(data);
-    if (blocked) {
-        console.log("should be blocked!!")
-        return {redirectUrl: browser.runtime.getURL("blocked.html")};
-    } else {
-        console.log("Nothing to do, let browser continue with its life");
-    }
-    console.log("final checkBrowserDomain");
-}
-
-async function checkManualDomain(domain, callback) {
-    console.log("inicio checkManualDomain");
-    let norm_domain = normalizeDomain(domain);
-    console.log("domain", norm_domain);
-    let data = computeDomainCryptoInfo(norm_domain);
-    let blocked = await callPSICheckDomain(data);
-    console.log("final checkManualDomain");
-    callback(blocked, norm_domain);
-}
-
-function activeProtection() {
-    if (active == "true") {
+// Active Protection functionality
+// Switch Active Protection status
+function activeProtection(active) {
+    console.log("active", active);
+    if (active) {
         browser.webRequest.onBeforeRequest.addListener(
             checkBrowserDomain,
             {urls: ["<all_urls>"], types: ["main_frame"]},
@@ -115,27 +100,33 @@ function activeProtection() {
     }
 }
 
-// Listen for changes in storage
-browser.storage.onChanged.addListener(changes => {
-    console.log("Updating data...")
-    let changedItems = Object.keys(changes);
+async function checkBrowserDomain(requestDetails) {
+    console.log("inicio checkBrowserDomain");
+    let url = new URL(requestDetails.url);
+    let domain = url.hostname;
+    let norm_domain = normalizeDomain(domain);
+    console.log("domain", norm_domain);
 
-    if (changedItems.includes("active")) {
-        active = changes.active.newValue;
-        activeProtection()
+    let data = computeDomainCryptoInfo(norm_domain);
+    let blocked = await callPSICheckDomain(data);
+    if (blocked) {
+        statistics += 1;
+        storeStatistics();
+        return {redirectUrl: browser.runtime.getURL("blocked.html")};
     }
+}
 
-    if (changedItems.includes("statistics")) {
-        statistics = changes.statistics.newValue;
-        //setBadgeData(statistics);
-    }
+// Manual Protection functionality
+async function checkManualDomain(domain, callback) {
+    console.log("inicio checkManualDomain");
+    let norm_domain = normalizeDomain(domain);
+    console.log("domain", norm_domain);
+    let data = computeDomainCryptoInfo(norm_domain);
+    let blocked = await callPSICheckDomain(data);
+    callback(blocked, norm_domain);
+}
 
-    console.log("Updated data!")
-});
-
+// initialize statistics on local storage on installation
 browser.runtime.onInstalled.addListener(details => {
-    browser.storage.local.set({
-        active: false,
-        statistics: statistics
-    });
+    browser.storage.local.set({statistics}).catch(onError);
 });

@@ -1,3 +1,30 @@
+.b-section-divider {
+  height: 1rem;
+  background-color: rgba(0, 0, 0, .1);
+  border: solid rgba(0, 0, 0, .15);
+  border-width: 1px 0;
+  /*box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);*/
+}
+
+body {
+    width: 600px;
+}
+
+.form-switch.form-switch-md {
+    padding-left: 4.5em;
+    height: 2.5em;
+}
+
+.form-switch.form-switch-md .form-check-input {
+    margin-left: -4.5em;
+    height: 2em;
+    width: 4em;
+}
+
+.form-switch.form-switch-md .form-check-label {
+    /*padding-top: 0.5em;*/
+
+}
 
 #outer-wrapper {
   padding: 0.5em;

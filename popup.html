@@ -5,30 +5,33 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" href="css/popup.css"/>
-  </head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="img/psidc-48.png" type="image/png">
+    <title>PSI Domain Check</title>
+  <head>
+  <body>
 
-<body>
-  <div id="hostname" class="pt-2">><b>domain.com</b></div>
-  <div id="popup-content" class="py-2">
-    <p>Total domains blocked: <span id="statistics">0</span></p>
-  </div>
-  <div id="outer-wrapper">
+    <div class="form-check form-switch form-switch-md">
+      <input class="form-check-input" type="checkbox" id="activeprotection">
+      <label class="form-check-label fs-4" for="activeprotection">Active Protection</label>
+    </div>
+    <div id="popup-content" class="py-2">
+      <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-dark" disabled>
+        Blocked domains <span id="statisticsbadge" class="badge badge-dark">0</span>
+        </button>
+        <button id="resetstatistics" type="button" class="btn btn-outline-primary">Reset Statistics</button>
+      </div>
+    </div>
+    <div class="b-section-divider"></div>
     <div class="input-group">
       <input id="url" type="text" placeholder="Type a url or domain" class="form-control">
-      <button id="checkdomain" type="button" class="btn btn-outline-dark">Check domain</button>
+      <button id="checkdomain" type="button" class="btn btn-outline-primary">Check domain</button>
     </div>
     <div id="manual-alert-container"></div>
-  </div>
-  <hr>
-  <!-- tools -->
-  <div id="basicTools" class="toolRibbon">
-    <button id="active-protection" type="button" class="btn btn-outline-primary" data-bs-toggle="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Protection status" autocomplete="off">Active Protection</button>
-    <button id="reset-statistics" class="btn btn-outline-secondary" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Reset statistics">Reset Statistics</button>
-  </div>
-  <div id="protection-alert-container"></div>
-  <footer id="footer">Privacy first security provided by PSIDomainCheck.es</footer>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/popup.js"></script>
-</body>
-
+    <div class="b-section-divider"></div>
+    <footer id="footer">Privacy first security provided by PSIDomainCheck.es</footer>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/popup.js"></script>
+  </body>
 </html>

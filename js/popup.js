@@ -4,6 +4,30 @@ function onError(error) {
   console.log(error)
 }
 
+function getDataFromLocalStorage() {
+    console.log("getDataFromLocalStorage");
+    browser.storage.local.get(["active","statistics"]).then(updateView, onError);
+}
+
+function updateView(items) {
+    updateProtectionSwitch(items.active);
+    updateStatistics(items.statistics);
+}
+
+function updateProtectionSwitch(item) {
+    activeProtectionSwitch.checked = item;
+}
+
+function updateStatistics(item) {
+    statisticsBadge.innerText = item;
+}
+
+function resetStatistics() {
+    console.log("resetStatistics");
+    browser.runtime.getBackgroundPage().then(
+            function(background) {return background.resetStatistics(getDataFromLocalStorage);}, onError);
+}
+
 function showResults(blocked, norm_domain) {
     console.log("blocked", blocked);
     if (blocked) {
@@ -37,19 +61,6 @@ function addAlert(message, elid, alert_type) {
     else {
         container.appendChild(div);
     }
-}
-
-function getHostname(tabs) {
-    console.log("Getting hostname...")
-    var domain = ""
-    var tab = tabs[0];
-    if (tab.url !== undefined) {
-        var url = new URL(tab.url);
-        if (url.protocol === "http:" || url.protocol === "https:")
-            domain = url.hostname;
-    }
-    hostnameView.innerHTML = domain.bold();
-    console.log("Get hostname done!")
 }
 
 function addhttp(url) {
@@ -91,35 +102,76 @@ function checkdomain() {
 }
 
 function protection() {
-    let mode = activeProtectionBtn.getAttribute('aria-pressed');
-    browser.storage.local.set({active: mode});
-    if (mode == "true") {
+    let active = this.checked;
+    // Send to local storage to be able for the popup to be stateful
+    browser.storage.local.set({active}).catch(onError);
+    browser.runtime.getBackgroundPage().then(
+            function(background) {background.activeProtection(active)}, onError);
+    if (active) {
         browser.browserAction.setIcon({path: "img/psidc-48@2x.png"});
-        addAlert("Protection enabled!", "protection-alert-container", "alert-success");
     } else {
         browser.browserAction.setIcon({path: "img/psidc-off-48@2x.png"});
-        addAlert("Protection disabled", "protection-alert-container", "alert-warning");
     }
 }
 
 // Data view
-let hostnameView = document.getElementById("hostname");
-let statisticsView = document.getElementById("statistics");
 let urlView = document.getElementById("url");
-let activeProtectionBtn = document.getElementById("active-protection");
+let activeProtectionSwitch = document.getElementById("activeprotection");
 let checkDomainBtn = document.getElementById("checkdomain");
-
-let hostname = browser.tabs.query({ active: true, currentWindow: true });
-hostname.then(getHostname, onError);
-
-
+let statisticsBtn = document.getElementById("resetstatistics");
+let statisticsBadge = document.getElementById("statisticsbadge");
 
 // Listeners
 checkDomainBtn.addEventListener('click', checkdomain);
-activeProtectionBtn.addEventListener('click', protection);
+activeProtectionSwitch.addEventListener('change', protection);
+statisticsBtn.addEventListener('click', resetStatistics)
+
 
 urlView.addEventListener("keyup", function(event) {
     if (event.key === "Enter") {
         checkdomain();
     }
 });
+
+getDataFromLocalStorage();
+
+// local storage onChanged not being fired on firefox
+// take another approach
+
+// browser.storage.onChanged.addListener(changes => {
+//     console.log("Updating data...")
+//     let changedItems = Object.keys(changes);
+
+//     if (changedItems.includes("active")) {
+//         console.log("found change in active");
+
+//     }
+
+//     if (changedItems.includes("statistics")) {
+//         console.log("found change in statistics");
+//     }
+//     console.log("Updated data!")
+//     console.log("hola");
+//     console.log(changes);
+//     updateStatistics();
+// });
+
+// function logStorageChange(changes, area) {
+//   console.log("Change in storage area: " + area);
+
+//   let changedItems = Object.keys(changes);
+
+//   for (let item of changedItems) {
+//     console.log(item + " has changed:");
+//     console.log("Old value: ");
+//     console.log(changes[item].oldValue);
+//     console.log("New value: ");
+//     console.log(changes[item].newValue);
+//   }
+// }
+
+// browser.storage.onChanged.addListener(logStorageChange);
+
+// console.log("has listener", browser.storage.onChanged.hasListener(logStorageChange));
+
+
