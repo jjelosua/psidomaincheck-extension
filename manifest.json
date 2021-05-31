@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "PSI Domain Check",
-  "version": "0.1",
+  "version": "0.2",
   "description": "Check domains privately using PSI and k-anonimity",
   "icons": {
     "48": "img/psidc-off-48.png",
