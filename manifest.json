@@ -7,6 +7,12 @@
     "48": "img/psidc-off-48.png",
     "96": "img/psidc-off-48@2x.png"
   },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "admin@psidomaincheck.es",
+      "update_url": "https://psidomaincheck/public/extension/updates.json"
+    }
+  },
   "permissions": [
     "alarms",
     "webRequest",
